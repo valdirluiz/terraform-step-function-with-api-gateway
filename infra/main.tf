@@ -132,7 +132,6 @@ EOF
 resource "aws_api_gateway_deployment" "pessoas_deployment" {
   depends_on = [aws_api_gateway_integration.step_function_integration]
   rest_api_id = aws_api_gateway_rest_api.pessoas_api.id
-  stage_name  = "ignored" # stage_name é obrigatório, mas será sobrescrito pelo aws_api_gateway_stage
   description = "Deployment for pessoas_api"
 }
 
