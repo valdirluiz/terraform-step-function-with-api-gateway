@@ -13,6 +13,14 @@
         }
       },
       "ResultPath": "$.dynamo_result",
+      "Next": "ApiGatewayResponseHandler"
+    },
+    "ApiGatewayResponseHandler": {
+      "Type": "Pass",
+      "Parameters": {
+        "statusCode": 200,
+        "body.$": "States.JsonToString($.dynamo_result.Item)"
+      },
       "End": true
     }
   }
