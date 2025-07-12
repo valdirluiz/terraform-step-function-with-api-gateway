@@ -91,41 +91,17 @@ resource "aws_iam_role_policy_attachment" "apigw_stepfunction_attach" {
   policy_arn = aws_iam_policy.apigw_stepfunction_policy.arn
 }
 
+resource "aws_api_gateway_rest_api" "pessoas_api" {
+  name        = "pessoas_api"
+  description = "API Gateway para pessoas"
+  body        = data.template_file.openapi.rendered
+}
+
 // definicao do gateway
 resource "aws_api_gateway_rest_api" "pessoas_api" {
   name        = "pessoas_api"
   description = "API Gateway para pessoas"
-}
-
-resource "aws_api_gateway_resource" "pessoas_resource" {
-  rest_api_id = aws_api_gateway_rest_api.pessoas_api.id
-  parent_id   = aws_api_gateway_rest_api.pessoas_api.root_resource_id
-  path_part   = "estudos"
-}
-
-resource "aws_api_gateway_resource" "v1_resource" {
-  rest_api_id = aws_api_gateway_rest_api.pessoas_api.id
-  parent_id   = aws_api_gateway_resource.pessoas_resource.id
-  path_part   = "v1"
-}
-
-resource "aws_api_gateway_resource" "pessoas_id_resource" {
-  rest_api_id = aws_api_gateway_rest_api.pessoas_api.id
-  parent_id   = aws_api_gateway_resource.v1_resource.id
-  path_part   = "pessoas"
-}
-
-resource "aws_api_gateway_resource" "id_resource" {
-  rest_api_id = aws_api_gateway_rest_api.pessoas_api.id
-  parent_id   = aws_api_gateway_resource.pessoas_id_resource.id
-  path_part   = "{id}"
-}
-
-resource "aws_api_gateway_method" "get_pessoa" {
-  rest_api_id   = aws_api_gateway_rest_api.pessoas_api.id
-  resource_id   = aws_api_gateway_resource.id_resource.id
-  http_method   = "GET"
-  authorization = "NONE"
+  body        = data.template_file.openapi.rendered 
 }
 
 resource "aws_api_gateway_integration" "step_function_integration" {
@@ -146,7 +122,6 @@ resource "aws_api_gateway_integration" "step_function_integration" {
 EOF
   }
 }
-
 
 
 # promocão do gateway

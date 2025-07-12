@@ -1,0 +1,69 @@
+openapi: 3.0.0
+info:
+  title: Pessoas API
+  version: 1.0.0
+paths:
+  /estudos/v1/pessoas/{id}:
+    get:
+      summary: Get pessoa by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Pessoa encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pessoa'
+        '404':
+          description: Pessoa não encontrada
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:${region}:states:action/StartSyncExecution
+        httpMethod: POST
+        type: aws
+        credentials: arn:aws:iam::${account_id}:role/apigw_stepfunction_role
+        requestTemplates:
+          application/json: |
+            {
+              "input": "{\"id\": \"$input.params('id')\"}",
+              "stateMachineArn": "arn:aws:states:${region}:${account_id}:stateMachine:get_pessoa"
+            }
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: |
+                {
+                  "statusCode": 200,
+                  "body": $input.json('$.output')
+                }
+components:
+  schemas:
+    Pessoa:
+      type: object
+      properties:
+        id:
+          type: string
+        nome:
+          type: string
+        cpf:
+          type: string
+        dependentes:
+          type: array
+          items:
+            type: object
+            properties:
+              nome:
+                type: string
+              enderecos:
+                type: array
+                items:
+                  type: string
+        enderecos:
+          type: array
+          items:
+            type: string
