@@ -91,36 +91,11 @@ resource "aws_iam_role_policy_attachment" "apigw_stepfunction_attach" {
   policy_arn = aws_iam_policy.apigw_stepfunction_policy.arn
 }
 
-resource "aws_api_gateway_rest_api" "pessoas_api" {
-  name        = "pessoas_api"
-  description = "API Gateway para pessoas"
-  body        = data.template_file.openapi.rendered
-}
-
 // definicao do gateway
 resource "aws_api_gateway_rest_api" "pessoas_api" {
   name        = "pessoas_api"
   description = "API Gateway para pessoas"
   body        = data.template_file.openapi.rendered 
-}
-
-resource "aws_api_gateway_integration" "step_function_integration" {
-  rest_api_id = aws_api_gateway_rest_api.pessoas_api.id
-  resource_id = aws_api_gateway_resource.id_resource.id
-  http_method = aws_api_gateway_method.get_pessoa.http_method
-  integration_http_method = "POST"
-  type        = "AWS"
-  uri         = "arn:aws:apigateway:${var.region}:states:action/StartSyncExecution"
-  credentials = aws_iam_role.apigw_stepfunction_role.arn
-
-  request_templates = {
-    "application/json" = <<EOF
-{
-  "input": "{\"id\": \"$input.params('id')\"}",
-  "stateMachineArn": "${aws_sfn_state_machine.get_pessoa.arn}"
-}
-EOF
-  }
 }
 
 
