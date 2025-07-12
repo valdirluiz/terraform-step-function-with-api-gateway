@@ -1,0 +1,19 @@
+{
+  "StartAt": "GetPessoa",
+  "States": {
+    "GetPessoa": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:getItem",
+      "Parameters": {
+        "TableName": "pessoas",
+        "Key": {
+          "id": {
+            "S.$": "$.id"
+          }
+        }
+      },
+      "ResultPath": "$.dynamo_result",
+      "End": true
+    }
+  }
+}

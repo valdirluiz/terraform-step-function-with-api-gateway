@@ -47,32 +47,49 @@ resource "aws_iam_role_policy_attachment" "attach_policy" {
 resource "aws_sfn_state_machine" "get_pessoa" {
   name     = "get_pessoa"
   role_arn = aws_iam_role.step_function_role.arn
+  definition = file("${path.module}/step-function/definition.json")
+}
 
-  definition = jsonencode({
-    StartAt = "GetPessoa",
-    States = {
-      GetPessoa = {
-        Type = "Task",
-        Resource = "arn:aws:states:::dynamodb:getItem",
-        Parameters = {
-          TableName = aws_dynamodb_table.pessoas.name
-          Key = {
-            id = {
-              S = "$.id"
-            }
-          }
-        },
-        ResultPath = "$.dynamo_result",
-        End = true
+# role api gateway
+
+resource "aws_iam_role" "apigw_stepfunction_role" {
+  name = "apigw_stepfunction_role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "apigateway.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
       }
-    }
+    ]
   })
 }
 
+resource "aws_iam_policy" "apigw_stepfunction_policy" {
+  name = "apigw_stepfunction_policy"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "states:StartExecution"
+        ]
+        Resource = aws_sfn_state_machine.get_pessoa.arn
+      }
+    ]
+  })
+}
 
-//
+resource "aws_iam_role_policy_attachment" "apigw_stepfunction_attach" {
+  role       = aws_iam_role.apigw_stepfunction_role.name
+  policy_arn = aws_iam_policy.apigw_stepfunction_policy.arn
+}
 
-
+// definicao do gateway
 resource "aws_api_gateway_rest_api" "pessoas_api" {
   name        = "pessoas_api"
   description = "API Gateway para pessoas"
@@ -116,7 +133,7 @@ resource "aws_api_gateway_integration" "step_function_integration" {
   integration_http_method = "POST"
   type        = "AWS"
   uri         = "arn:aws:apigateway:${var.region}:states:action/StartExecution"
-  credentials = aws_iam_role.step_function_role.arn
+  credentials = aws_iam_role.apigw_stepfunction_role.arn
 
   request_templates = {
     "application/json" = <<EOF
@@ -129,6 +146,8 @@ EOF
 }
 
 
+
+# promocão do gateway
 resource "aws_api_gateway_deployment" "pessoas_deployment" {
   depends_on = [aws_api_gateway_integration.step_function_integration]
   rest_api_id = aws_api_gateway_rest_api.pessoas_api.id
