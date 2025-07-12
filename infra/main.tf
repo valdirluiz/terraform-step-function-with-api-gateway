@@ -76,7 +76,8 @@ resource "aws_iam_policy" "apigw_stepfunction_policy" {
       {
         Effect = "Allow"
         Action = [
-          "states:StartExecution"
+          "states:StartExecution",
+          "states:StartSyncExecution"
         ]
         Resource = aws_sfn_state_machine.get_pessoa.arn
       }
