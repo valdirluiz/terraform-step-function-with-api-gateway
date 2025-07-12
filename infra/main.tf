@@ -48,6 +48,7 @@ resource "aws_sfn_state_machine" "get_pessoa" {
   name     = "get_pessoa"
   role_arn = aws_iam_role.step_function_role.arn
   definition = file("${path.module}/step-function/definition.json")
+  type          =     "STANDARD"
 }
 
 # role api gateway
