@@ -3,9 +3,6 @@
   "States": {
     "IniciaExecucaoSincrona": {
       "Type": "Task",
-      "Parameters": {
-        "StateMachineArn": "MyData"
-      },
       "Resource": "arn:aws:states:::aws-sdk:sfn:startSyncExecution",
       "Next": "GetPessoa"
     },
