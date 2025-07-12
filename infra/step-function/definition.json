@@ -13,13 +13,32 @@
         }
       },
       "ResultPath": "$.dynamo_result",
-      "Next": "ApiGatewayResponseHandler"
+      "Next": "ItemExiste?"
+    },
+    "ItemExiste?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.dynamo_result.Item",
+          "IsPresent": true,
+          "Next": "ApiGatewayResponseHandler"
+        }
+      ],
+      "Default": "ItemNotFoundHandler"
     },
     "ApiGatewayResponseHandler": {
       "Type": "Pass",
       "Parameters": {
         "statusCode": 200,
         "body.$": "States.JsonToString($.dynamo_result.Item)"
+      },
+      "End": true
+    },
+    "ItemNotFoundHandler": {
+      "Type": "Pass",
+      "Parameters": {
+        "statusCode": 404,
+        "body": "{\"msg\": \"Pessoa não existe\"}"
       },
       "End": true
     }
