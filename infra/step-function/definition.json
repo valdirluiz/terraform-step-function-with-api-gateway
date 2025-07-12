@@ -1,7 +1,7 @@
 {
-  "StartAt": "ConsultarPessoa",
+  "StartAt": "GetPessoa",
   "States": {
-    "ConsultarPessoa": {
+    "GetPessoa": {
       "Type": "Task",
       "Resource": "arn:aws:states:::dynamodb:getItem",
       "Parameters": {
