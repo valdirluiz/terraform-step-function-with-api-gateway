@@ -132,7 +132,7 @@ resource "aws_api_gateway_integration" "step_function_integration" {
   http_method = aws_api_gateway_method.get_pessoa.http_method
   integration_http_method = "POST"
   type        = "AWS"
-  uri         = "arn:aws:apigateway:${var.region}:states:action/StartExecution"
+  uri         = "arn:aws:apigateway:${var.region}:states:action/StartSyncExecution"
   credentials = aws_iam_role.apigw_stepfunction_role.arn
 
   request_templates = {
