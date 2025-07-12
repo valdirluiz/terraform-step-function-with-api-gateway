@@ -37,10 +37,13 @@ paths:
             statusCode: "200"
             responseTemplates:
               application/json: |
-                {
-                  "statusCode": 200,
-                  "body": $input.json('$.output')
-                }
+                #set($body = $input.json('$.output.body'))
+                $body
+          "404":
+            statusCode: "404"
+            selectionPattern: "404"
+            responseTemplates:
+              application/json: "$input.json('$.body')"      
 components:
   schemas:
     Pessoa:
