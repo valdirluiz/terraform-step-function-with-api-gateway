@@ -37,8 +37,7 @@ paths:
             statusCode: "200"
             responseTemplates:
               application/json: |
-                #set($body = $input.json('$.output.body'))
-                $body
+                $input.json('$.body')
           "404":
             statusCode: "404"
             selectionPattern: "404"
