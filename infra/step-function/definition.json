@@ -1,12 +1,7 @@
 {
-  "StartAt": "IniciaExecucaoSincrona",
+  "StartAt": "ConsultarPessoa",
   "States": {
-    "IniciaExecucaoSincrona": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::aws-sdk:sfn:startSyncExecution",
-      "Next": "GetPessoa"
-    },
-    "GetPessoa": {
+    "ConsultarPessoa": {
       "Type": "Task",
       "Resource": "arn:aws:states:::dynamodb:getItem",
       "Parameters": {
